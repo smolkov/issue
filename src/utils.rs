@@ -15,7 +15,6 @@ pub const DESCRIPTION: &'static str = "Description";
 pub const CREATED: &'static str = "Created";
 pub const UUID: &'static str = "Uuid";
 pub const LABELS: &'static str = "Labels";
-
 pub const URG: &'static str = "Urg.";
 pub const NAME: &'static str = "Name";
 pub const VALUE: &'static str = "Value";

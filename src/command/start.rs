@@ -6,15 +6,18 @@ use crate::utils::issue_id;
 
 #[derive(Debug, Parser)]
 pub struct Cli {
-    /// New todo title
-    issue: usize,
+    /// All Issue id you want to stop working timer
+    issue: Vec<usize>,
 }
 
 impl Cli {
     pub fn run(&self, repository: &mut Repository) -> Result<()> {
-       
-        repository.start(issue_id(self.issue))?;
-        repository.save()?;
+        for id in self.issue.iter() {
+            if let Some(mut issue) = repository.get_issue(issue_id(*id)) {
+                issue.start();    
+                repository.update_backlog(issue)?;
+            }
+        }
         Ok(())
     }
 }

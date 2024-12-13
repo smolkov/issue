@@ -1,8 +1,11 @@
 use std::time::Duration;
 
 use chrono::prelude::*;
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
+use crate::repository::Repository;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Pagination {
@@ -45,7 +48,23 @@ impl Issue {
             self.label.push(label.to_owned());
         }
     }
+    pub fn start(&mut self) {
+        self.started = Some(Utc::now());
+    }
+    pub fn stop(&mut self,repository:&mut Repository) -> Result<()>{
+        if let Some(start_time) = self.started {
+            let diff: chrono::TimeDelta = Utc::now() - start_time;
+            let sec = if diff.num_seconds() < 0 {
+                0 as u64
+            } else {
+                diff.num_seconds() as u64
+            };
+            repository.add_time_entry(self, Utc::now(), Duration::from_secs(sec))?;
+        }
+        Ok(())
+    }
 }
+
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct TimeEntry {
@@ -71,5 +90,6 @@ impl Label {
             description: description.to_owned(),
         }
     }
-    
 }
+
+

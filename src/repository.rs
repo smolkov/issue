@@ -95,52 +95,6 @@ impl Repository {
         }
         todos
     }
-   
-    pub fn start(&mut self, id: usize) -> Result<Issue> {
-        if let Some(stop_id) = self
-            .backlog
-            .iter()
-            .position(|issue| issue.started.is_some())
-        {
-            self.stop(stop_id)?;
-        }
-        let issue = self
-            .backlog
-            .get_mut(id)
-            .map(|i| {
-                i.started = Some(Utc::now());
-                i.clone()
-            })
-            .ok_or(anyhow::anyhow!("stop issue id {} not found", id))?;
-        println!("Starting task {} {}", id, issue.title);
-        Ok(issue.clone())
-    }
-
-    pub fn stop(&mut self, id: usize) -> Result<Issue> {
-        let issue = self
-            .backlog
-            .get_mut(id)
-            .ok_or(anyhow::anyhow!("start issue id {} not found", id))?;
-        let diff = Utc::now() - issue.started.unwrap_or(Utc::now());
-        let issue = issue.clone();
-
-        let sec = if diff.num_seconds() < 0 {
-            0 as u64
-        } else {
-            diff.num_seconds() as u64
-        };
-
-        self.add_time_entry(&issue, Utc::now(), Duration::from_secs(sec))?;
-        println!(
-            "Stoping task {} {} working time {} sec",
-            id, issue.title, sec
-        );
-        Ok(issue.clone())
-    }
-    pub fn save_working(&mut self) -> Result<()> {
-        fs::write(WORKSPACE.working(), serde_json::to_string(&self.working)?)?;
-        Ok(())
-    }
     pub fn save(&self) -> Result<()> {
         fs::write(WORKSPACE.backlog(), serde_json::to_string(&self.backlog)?)?;
         fs::write(WORKSPACE.working(), serde_json::to_string(&self.working)?)?;
