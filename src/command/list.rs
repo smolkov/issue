@@ -62,11 +62,6 @@ impl Cli {
                 style::Print(format!("{:<4}", id + 1,)),
                 style::SetAttribute(style::Attribute::NoBold),
                 style::SetForegroundColor(Color::Reset),
-                // cursor::MoveToNextLine(0)
-            )?;
-          
-            execute!(
-                stdout(),
                 style::SetBackgroundColor(background),
                 style::Print(format!(
                     "{:<4} {:<title_len$} {}",
@@ -76,9 +71,8 @@ impl Cli {
                 )),
                 style::SetForegroundColor(Color::Reset),
                 style::ResetColor,
-                // cursor::MoveToNextLine(0)
+                style::Print("\n"),
             )?;
-            execute!( stdout(),style::ResetColor,style::Print("\n"))?;
         }
         Ok(())
     }
