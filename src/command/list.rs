@@ -1,7 +1,6 @@
 use anyhow::Result;
 use chrono::Utc;
 use clap::Parser;
-use crossterm::style::style;
 use crossterm::{execute, style, style::Color};
 use std::io::stdout;
 
@@ -51,7 +50,7 @@ impl Cli {
         for (id, issue) in issues.iter().enumerate() {
             let background = if issue.started.is_some() {
                 Color::DarkYellow
-            }else {
+            } else {
                 Color::Reset
             };
             execute!(

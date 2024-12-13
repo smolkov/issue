@@ -9,7 +9,7 @@ use crate::utils::issue_id;
 use crate::{data::Label, repository::Repository};
 
 #[derive(Debug, Parser)]
-struct Add {
+pub struct Add {
     /// Issue id
     issue: usize,
     /// Labels to add   bug or type:bug
@@ -17,7 +17,7 @@ struct Add {
 }
 
 #[derive(Debug, Parser)]
-struct Create {
+pub struct Create {
     /// Label name
     label: String,
     /// Color
@@ -28,7 +28,7 @@ struct Create {
 
 #[derive(Debug, Parser)]
 /// Show all labels
-struct Show {}
+pub struct Show {}
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
@@ -105,11 +105,11 @@ impl Show {
             stdout(),
             style::SetAttribute(style::Attribute::Bold),
             style::SetAttribute(style::Attribute::Underlined),
-            style::Print(format!("Show all labels:")),
+            style::Print("Show all labels:"),
             style::SetAttribute(style::Attribute::NoUnderline),
             style::SetAttribute(style::Attribute::NoBold),
             style::ResetColor,
-            style::Print("\n"), 
+            style::Print("\n"),
         )?;
 
         let max_len = repository
@@ -122,13 +122,11 @@ impl Show {
             execute!(
                 stdout(),
                 style::ResetColor,
-                style::SetBackgroundColor(
-                    Color::from_str(&label.color).unwrap_or(Color::Black)
-                ),
+                style::SetBackgroundColor(Color::from_str(&label.color).unwrap_or(Color::Black)),
                 style::Print(format!("{:<max_len$}", label.name)),
                 style::ResetColor,
-                style::Print(format!(" {}", label.description)), 
-                style::Print("\n"), 
+                style::Print(format!(" {}", label.description)),
+                style::Print("\n"),
             )?;
         }
         Ok(())

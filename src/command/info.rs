@@ -4,12 +4,12 @@ use clap::Parser;
 use crate::data::Pagination;
 use crate::repository::Repository;
 
-use crate::utils::{print_issue_info,issue_id};
+use crate::utils::{issue_id, print_issue_info};
 
 #[derive(Debug, Parser)]
 pub struct Cli {
     /// List of issue IDs to print information about( Leave it empty to print all)
-    ids: Vec<usize>, 
+    ids: Vec<usize>,
 }
 
 impl Cli {
@@ -20,12 +20,11 @@ impl Cli {
         };
         let issues = repository.list(pagination);
         for (id, issue) in issues.iter().enumerate() {
-            if self.ids.is_empty() || self.ids.iter().find(|&&index| issue_id(index) == id).is_some() {
-                print_issue_info(id+1, issue, repository)?;
+            if self.ids.is_empty() || self.ids.iter().any(|&index| issue_id(index) == id) {
+                print_issue_info(id + 1, issue, repository)?;
                 println!("\n");
             }
         }
         Ok(())
     }
 }
-

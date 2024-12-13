@@ -12,16 +12,14 @@ use crate::workspace::WORKSPACE;
 
 #[derive(Debug)]
 pub struct Repository {
-    config: Config,
     pub backlog: Vec<Issue>,
     pub working: Vec<TimeEntry>,
     pub labels: Vec<Label>,
 }
 
 impl Repository {
-    pub fn new(config: Config) -> Repository {
+    pub fn new(_config: Config) -> Repository {
         Repository {
-            config,
             backlog: Vec::new(),
             working: Vec::new(),
             labels: Vec::new(),
@@ -72,13 +70,10 @@ impl Repository {
         Ok(self.backlog.remove(id))
     }
     pub fn get_issue(&self, id: usize) -> Option<Issue> {
-        self.backlog.get(id).map(|todo| todo.clone())
+        self.backlog.get(id).cloned()
     }
     pub fn get_label(&self, label: &str) -> Option<Label> {
-        self.labels
-            .iter()
-            .find(|&l| l.name == label)
-            .map(|l| l.clone())
+        self.labels.iter().find(|&l| l.name == label).cloned()
     }
     pub fn list(&self, pagination: Pagination) -> Vec<Issue> {
         let mut todos = Vec::new();

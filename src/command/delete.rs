@@ -5,7 +5,7 @@ use crate::repository::Repository;
 
 #[derive(Debug, Parser)]
 pub struct Cli {
-    /// issues id to delete 
+    /// issues id to delete
     ids: Vec<u32>,
 }
 
@@ -16,7 +16,7 @@ impl Cli {
         for id in ids.iter().rev() {
             let id = if *id > 0 { *id - 1 } else { *id };
 
-            if let Err(_) = repository.delete(id as usize) {
+            if repository.delete(id as usize).is_err() {
                 println!("issue {} don't exist in repository", id);
             }
         }

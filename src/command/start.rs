@@ -14,7 +14,7 @@ impl Cli {
     pub fn run(&self, repository: &mut Repository) -> Result<()> {
         for id in self.issue.iter() {
             if let Some(mut issue) = repository.get_issue(issue_id(*id)) {
-                issue.start();    
+                issue.start();
                 repository.update_backlog(issue)?;
             }
         }

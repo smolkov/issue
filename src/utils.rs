@@ -1,25 +1,24 @@
-use std::io;
 use std::io::stdout;
 use std::str::FromStr;
 
-use chrono::TimeDelta;
 use anyhow::Result;
+use chrono::TimeDelta;
 use crossterm::{execute, style, style::Color};
 
 use crate::data::Issue;
 use crate::repository::Repository;
 
-pub const ID: &'static str = "ID";
-pub const AGE: &'static str = "Age";
-pub const DESCRIPTION: &'static str = "Description";
-pub const CREATED: &'static str = "Created";
-pub const UUID: &'static str = "Uuid";
-pub const LABELS: &'static str = "Labels";
-pub const URG: &'static str = "Urg.";
-pub const NAME: &'static str = "Name";
-pub const VALUE: &'static str = "Value";
+pub const ID: &str = "ID";
+pub const AGE: &str = "Age";
+pub const DESCRIPTION: &str = "Description";
+pub const CREATED: &str = "Created";
+pub const UUID: &str = "Uuid";
+pub const LABELS: &str = "Labels";
+pub const URG: &str = "Urg.";
+pub const NAME: &str = "Name";
+pub const VALUE: &str = "Value";
 
-pub const ISSUE_NAMES: [&'static str; 4] = [ID, DESCRIPTION, CREATED, LABELS];
+pub const ISSUE_NAMES: [&str; 4] = [ID, DESCRIPTION, CREATED, LABELS];
 pub const NAME_WIDTH: usize = 12;
 
 const MINUT_IN_SECOND: i64 = 60;
@@ -39,9 +38,7 @@ pub fn print_age(timedelta: TimeDelta) -> String {
     }
 }
 
-
-
-pub fn print_issue_info(id: usize, issue: &Issue,repository: &Repository) -> Result<()>{
+pub fn print_issue_info(id: usize, issue: &Issue, repository: &Repository) -> Result<()> {
     execute!(
         stdout(),
         style::SetAttribute(style::Attribute::Bold),
@@ -52,37 +49,36 @@ pub fn print_issue_info(id: usize, issue: &Issue,repository: &Repository) -> Res
         style::SetAttribute(style::Attribute::NoUnderline),
         style::ResetColor,
         style::Print("\n"),
-        // cursor::MoveToNextLine(0)
     )?;
     execute!(
         stdout(),
         style::Print(format!("{:<NAME_WIDTH$} {}\n", ID, id)),
         style::Print(format!("{:<NAME_WIDTH$} {}\n", DESCRIPTION, issue.title)),
-        style::Print(format!("{:<NAME_WIDTH$} {}\n", CREATED, issue.created.format("%Y.%m.%d %H:%M:%S"))),
+        style::Print(format!(
+            "{:<NAME_WIDTH$} {}\n",
+            CREATED,
+            issue.created.format("%Y.%m.%d %H:%M:%S")
+        )),
         style::Print(format!("{:<NAME_WIDTH$} {}\n", UUID, issue.id)),
         // cursor::MoveToNextLine(0)
     )?;
     execute!(
-        stdout(), 
+        stdout(),
         style::ResetColor,
-        style::Print(format!("{:<NAME_WIDTH$}", LABELS)), 
+        style::Print(format!("{:<NAME_WIDTH$}", LABELS)),
     )?;
     for label in issue.label.iter() {
         if let Some(label) = repository.get_label(label) {
             execute!(
-                stdout(), 
+                stdout(),
                 style::ResetColor,
-                style::SetBackgroundColor(Color::from_str(&label.color).unwrap_or(Color::Black)), 
-                style::Print(format!("{}",label.name)), 
+                style::SetBackgroundColor(Color::from_str(&label.color).unwrap_or(Color::Black)),
+                style::Print(label.name.as_str()),
                 style::ResetColor,
             )?;
         }
     }
-    execute!(
-        stdout(), 
-        style::ResetColor,
-        style::Print("\n"), 
-    )?;
+    execute!(stdout(), style::ResetColor, style::Print("\n"),)?;
     Ok(())
 }
 

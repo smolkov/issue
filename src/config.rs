@@ -4,14 +4,14 @@ use std::fs;
 
 use crate::workspace::WORKSPACE;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Config {}
 
-impl Default for Config {
-    fn default() -> Self {
-        Config {}
-    }
-}
+// impl Default for Config {
+//     fn default() -> Self {
+//         Config {}
+//     }
+// }
 
 impl Config {
     pub fn load() -> Result<Config> {

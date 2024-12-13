@@ -1,7 +1,7 @@
 use std::time::Duration;
 
-use chrono::prelude::*;
 use anyhow::Result;
+use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -35,27 +35,27 @@ impl Issue {
             started: None,
         }
     }
-    pub fn add_label(&mut self,label: &str) {
+    pub fn add_label(&mut self, label: &str) {
         //TODO: create copy from string.
         if self.label.contains(&label.to_string()) {
             return;
         }
-        if let Some((scope,_)) = label.split_once(":") {
-            if let Some(pos)=self.label.iter_mut().position(|l| l.starts_with(scope)) {
+        if let Some((scope, _)) = label.split_once(":") {
+            if let Some(pos) = self.label.iter_mut().position(|l| l.starts_with(scope)) {
                 self.label[pos] = label.to_owned();
             }
-        }else {
+        } else {
             self.label.push(label.to_owned());
         }
     }
     pub fn start(&mut self) {
         self.started = Some(Utc::now());
     }
-    pub fn stop(&mut self,repository:&mut Repository) -> Result<()>{
+    pub fn stop(&mut self, repository: &mut Repository) -> Result<()> {
         if let Some(start_time) = self.started {
             let diff: chrono::TimeDelta = Utc::now() - start_time;
             let sec = if diff.num_seconds() < 0 {
-                0 as u64
+                0_u64
             } else {
                 diff.num_seconds() as u64
             };
@@ -65,7 +65,6 @@ impl Issue {
     }
 }
 
-
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct TimeEntry {
     pub id: String,
@@ -73,23 +72,19 @@ pub struct TimeEntry {
     pub duration: Duration,
 }
 
-
-#[derive(Debug,Deserialize,Serialize,Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Label {
     pub name: String,
     pub color: String,
     pub description: String,
-
 }
 
 impl Label {
-    pub fn new(name:&str,color:&str,description:&str) -> Label {
-        Label{
+    pub fn new(name: &str, color: &str, description: &str) -> Label {
+        Label {
             name: name.to_owned(),
             color: color.to_owned(),
             description: description.to_owned(),
         }
     }
 }
-
-

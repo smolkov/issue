@@ -5,12 +5,12 @@ use crate::repository::Repository;
 
 pub mod add;
 pub mod delete;
-pub mod list;
+pub mod info;
 pub mod label;
+pub mod list;
 pub mod new;
 pub mod start;
 pub mod stop;
-pub mod info;
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
@@ -24,7 +24,7 @@ pub enum Command {
     Label(label::Cli),
     /// Show todo list
     Info(info::Cli),
-     /// Start working on issue
+    /// Start working on issue
     Start(start::Cli),
     /// Stop working on issue
     Stop(stop::Cli),

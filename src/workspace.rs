@@ -9,7 +9,7 @@ const WORKING: &str = "working.json";
 const LABELS: &str = "labels.json";
 const CONFIG: &str = "config.toml";
 
-pub static WORKSPACE: Lazy<Workspace> = Lazy::new(|| Workspace::new());
+pub static WORKSPACE: Lazy<Workspace> = Lazy::new(Workspace::new);
 
 pub struct Workspace {
     directory: PathBuf,
@@ -34,17 +34,17 @@ impl Workspace {
         let config = directory.join(CONFIG);
         let labels = directory.join(LABELS);
         if !backlog.is_file() {
-            if let Err(e) = fs::write(&backlog,"[]") {
+            if let Err(e) = fs::write(&backlog, "[]") {
                 panic!("Create empty backlog error - {}", e);
             }
         }
         if !working.is_file() {
-            if let Err(e) = fs::write(&working,"[]") {
+            if let Err(e) = fs::write(&working, "[]") {
                 panic!("Create empty backlog work log error - {}", e);
             }
         }
         if !labels.is_file() {
-            if let Err(e) = fs::write(&labels,"[]") {
+            if let Err(e) = fs::write(&labels, "[]") {
                 panic!("Create empty labels error - {}", e);
             }
         }
@@ -53,7 +53,7 @@ impl Workspace {
             backlog,
             working,
             config,
-            labels
+            labels,
         }
     }
     pub fn directory(&self) -> &Path {
@@ -70,5 +70,12 @@ impl Workspace {
     }
     pub fn labels(&self) -> &Path {
         &self.labels
+    }
+}
+
+
+impl Default for Workspace {
+    fn default() -> Self {
+        Self::new()
     }
 }
