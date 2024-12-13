@@ -43,6 +43,8 @@ impl Issue {
         if let Some((scope, _)) = label.split_once(":") {
             if let Some(pos) = self.label.iter_mut().position(|l| l.starts_with(scope)) {
                 self.label[pos] = label.to_owned();
+            }else {
+                self.label.push(label.to_owned());
             }
         } else {
             self.label.push(label.to_owned());

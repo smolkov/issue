@@ -5,7 +5,7 @@ use anyhow::Result;
 use chrono::TimeDelta;
 use crossterm::{execute, style, style::Color};
 
-use crate::data::Issue;
+use crate::data::{Issue,Label};
 use crate::repository::Repository;
 
 pub const ID: &str = "ID";
@@ -68,15 +68,17 @@ pub fn print_issue_info(id: usize, issue: &Issue, repository: &Repository) -> Re
         style::Print(format!("{:<NAME_WIDTH$}", LABELS)),
     )?;
     for label in issue.label.iter() {
-        if let Some(label) = repository.get_label(label) {
-            execute!(
-                stdout(),
-                style::ResetColor,
-                style::SetBackgroundColor(Color::from_str(&label.color).unwrap_or(Color::Black)),
-                style::Print(label.name.as_str()),
-                style::ResetColor,
-            )?;
-        }
+        let label = repository
+            .get_label(label)
+            .unwrap_or(Label::new(label, "black", ""));
+        execute!(
+            stdout(),
+            style::ResetColor,
+            style::SetBackgroundColor(Color::from_str(&label.color).unwrap_or(Color::Black)),
+            style::Print(label.name.as_str()),
+            style::ResetColor,
+            style::Print(" "),
+        )?;
     }
     execute!(stdout(), style::ResetColor, style::Print("\n"),)?;
     Ok(())

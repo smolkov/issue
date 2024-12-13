@@ -65,7 +65,7 @@ impl Add {
         for label in self.labels.iter() {
             let label = repository
                 .get_label(label)
-                .unwrap_or(Label::new(label, "white", ""));
+                .unwrap_or(Label::new(label, "black", ""));
             issue.add_label(&label.name);
         }
         println!("{:#?}", issue);
