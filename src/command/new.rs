@@ -14,7 +14,7 @@ impl Cli {
     pub fn run(&self, repository: &mut Repository) -> Result<()> {
         let title = self.title.join(" ");
         let issue = Issue::new(&title);
-        repository.add(&issue);
+        repository.add_backlog(&issue);
         repository.save()?;
         Ok(())
     }

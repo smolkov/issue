@@ -9,9 +9,8 @@ fn main() -> Result<()> {
     let args = Args::parse();
     let config = Config::load().unwrap_or_default();
     let mut repository = Repository::new(config);
-    if repository.load().is_err() {
-        println!("First time start? issue repository don't exist( create a new issue repository)");
-        repository.save()?;
+    if let Err(e) = repository.load() {
+        return Err(anyhow::anyhow!("Load repository error - {e}"));
     }
     args.command.run(&mut repository)?;
     Ok(())

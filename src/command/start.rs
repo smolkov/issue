@@ -2,6 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 
 use crate::repository::Repository;
+use crate::utils::issue_id;
 
 #[derive(Debug, Parser)]
 pub struct Cli {
@@ -11,12 +12,8 @@ pub struct Cli {
 
 impl Cli {
     pub fn run(&self, repository: &mut Repository) -> Result<()> {
-        let id = if self.issue > 0 {
-            self.issue - 1
-        } else {
-            self.issue
-        };
-        repository.start(id)?;
+       
+        repository.start(issue_id(self.issue))?;
         repository.save()?;
         Ok(())
     }

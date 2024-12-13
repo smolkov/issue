@@ -6,7 +6,7 @@ use anyhow::Result;
 use chrono::{DateTime, Utc};
 
 use crate::config::Config;
-use crate::data::{Pagination, Issue, TimeEntry};
+use crate::data::{Issue, Label, Pagination, TimeEntry};
 
 use crate::workspace::WORKSPACE;
 
@@ -15,6 +15,7 @@ pub struct Repository {
     config: Config,
     pub backlog: Vec<Issue>,
     pub working: Vec<TimeEntry>,
+    pub labels: Vec<Label>,
 }
 
 impl Repository {
@@ -23,10 +24,42 @@ impl Repository {
             config,
             backlog: Vec::new(),
             working: Vec::new(),
+            labels: Vec::new(),
         }
     }
-    pub fn add(&mut self, todo: &Issue) {
+    pub fn backlog(&self) -> &Vec<Issue> {
+        &self.backlog
+    }
+    pub fn working(&self) -> &Vec<TimeEntry> {
+        &self.working
+    }
+    pub fn labels(&self) -> &Vec<Label> {
+        &self.labels
+    }
+    pub fn add_backlog(&mut self, todo: &Issue) {
         self.backlog.push(todo.clone())
+    }
+    pub fn add_label(&mut self, label: &Label) {
+        self.labels.push(label.clone())
+    }
+    pub fn add_time_entry(
+        &mut self,
+        issue: &Issue,
+        date: DateTime<Utc>,
+        duration: Duration,
+    ) -> Result<()> {
+        let entry = TimeEntry {
+            id: issue.id.clone(),
+            date,
+            duration,
+        };
+        self.working.push(entry);
+        self.working.sort_by(|a, b| {
+            a.date
+                .partial_cmp(&b.date)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        Ok(())
     }
     pub fn delete(&mut self, id: usize) -> Result<Issue> {
         if id >= self.backlog.len() {
@@ -38,8 +71,14 @@ impl Repository {
         }
         Ok(self.backlog.remove(id))
     }
-    pub fn get(&self, id: usize) -> Option<Issue> {
+    pub fn get_issue(&self, id: usize) -> Option<Issue> {
         self.backlog.get(id).map(|todo| todo.clone())
+    }
+    pub fn get_label(&self, label: &str) -> Option<Label> {
+        self.labels
+            .iter()
+            .find(|&l| l.name == label)
+            .map(|l| l.clone())
     }
     pub fn list(&self, pagination: Pagination) -> Vec<Issue> {
         let mut todos = Vec::new();
@@ -56,32 +95,14 @@ impl Repository {
         }
         todos
     }
-    pub fn add_work(
-        &mut self,
-        issue: &Issue,
-        date: DateTime<Utc>,
-        duration: Duration,
-    ) -> Result<()> {
-        let work = TimeEntry {
-            id: issue.id.clone(),
-            date,
-            duration,
-        };
-        self.working.push(work);
-        self.working.sort_by(|a, b| {
-            a.date
-                .partial_cmp(&b.date)
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
-        Ok(())
-    }
+   
     pub fn start(&mut self, id: usize) -> Result<Issue> {
-		
         if let Some(stop_id) = self
             .backlog
-            .iter().position(|issue| issue.started.is_some())
+            .iter()
+            .position(|issue| issue.started.is_some())
         {
-			self.stop(stop_id)?;
+            self.stop(stop_id)?;
         }
         let issue = self
             .backlog
@@ -91,7 +112,7 @@ impl Repository {
                 i.clone()
             })
             .ok_or(anyhow::anyhow!("stop issue id {} not found", id))?;
-		println!("Starting task {} {}",id,issue.title);
+        println!("Starting task {} {}", id, issue.title);
         Ok(issue.clone())
     }
 
@@ -100,21 +121,20 @@ impl Repository {
             .backlog
             .get_mut(id)
             .ok_or(anyhow::anyhow!("start issue id {} not found", id))?;
-        let diff = Utc::now() - issue.started.unwrap();
-		let issue = issue.clone();
+        let diff = Utc::now() - issue.started.unwrap_or(Utc::now());
+        let issue = issue.clone();
 
-		let sec = if diff.num_seconds() < 0 {
-			0 as u64
-		}else {
-			diff.num_seconds() as u64
-		};
+        let sec = if diff.num_seconds() < 0 {
+            0 as u64
+        } else {
+            diff.num_seconds() as u64
+        };
 
-        self.add_work(
-            &issue,
-            Utc::now(),
-            Duration::from_secs(sec),
-        )?;
-		println!("Stoping task {} {} working time {} sec",id,issue.title,sec);
+        self.add_time_entry(&issue, Utc::now(), Duration::from_secs(sec))?;
+        println!(
+            "Stoping task {} {} working time {} sec",
+            id, issue.title, sec
+        );
         Ok(issue.clone())
     }
     pub fn save_working(&mut self) -> Result<()> {
@@ -124,17 +144,19 @@ impl Repository {
     pub fn save(&self) -> Result<()> {
         fs::write(WORKSPACE.backlog(), serde_json::to_string(&self.backlog)?)?;
         fs::write(WORKSPACE.working(), serde_json::to_string(&self.working)?)?;
+        fs::write(WORKSPACE.labels(), serde_json::to_string(&self.labels)?)?;
         Ok(())
     }
     pub fn load(&mut self) -> Result<()> {
         self.backlog = serde_json::from_str(fs::read_to_string(WORKSPACE.backlog())?.as_str())?;
         self.working = serde_json::from_str(fs::read_to_string(WORKSPACE.working())?.as_str())?;
+        self.labels = serde_json::from_str(fs::read_to_string(WORKSPACE.labels())?.as_str())?;
         Ok(())
     }
-    // fn update(&mut self, id: usize, issue: Issue) -> Result<()> {
-    //     if let Some(i) = self.backlog.get_mut(id) {
-    //         *i = issue;
-    //     }
-    //     Ok(())
-    // }
+    pub fn update_backlog(&mut self, issue: Issue) -> Result<()> {
+        if let Some(i) = self.backlog.iter_mut().find(|i| i.id == issue.id) {
+            *i = issue;
+        }
+        Ok(())
+    }
 }

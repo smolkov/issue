@@ -6,6 +6,7 @@ use std::{
 
 const BACKLOG: &str = "backlog.json";
 const WORKING: &str = "working.json";
+const LABELS: &str = "labels.json";
 const CONFIG: &str = "config.toml";
 
 pub static WORKSPACE: Lazy<Workspace> = Lazy::new(|| Workspace::new());
@@ -15,6 +16,7 @@ pub struct Workspace {
     backlog: PathBuf,
     working: PathBuf,
     config: PathBuf,
+    labels: PathBuf,
 }
 
 impl Workspace {
@@ -30,11 +32,28 @@ impl Workspace {
         let backlog = directory.join(BACKLOG);
         let working = directory.join(WORKING);
         let config = directory.join(CONFIG);
+        let labels = directory.join(LABELS);
+        if !backlog.is_file() {
+            if let Err(e) = fs::write(&backlog,"[]") {
+                panic!("Create empty backlog error - {}", e);
+            }
+        }
+        if !working.is_file() {
+            if let Err(e) = fs::write(&working,"[]") {
+                panic!("Create empty backlog work log error - {}", e);
+            }
+        }
+        if !labels.is_file() {
+            if let Err(e) = fs::write(&labels,"[]") {
+                panic!("Create empty labels error - {}", e);
+            }
+        }
         Workspace {
             directory,
             backlog,
             working,
-            config
+            config,
+            labels
         }
     }
     pub fn directory(&self) -> &Path {
@@ -48,5 +67,8 @@ impl Workspace {
     }
     pub fn config(&self) -> &Path {
         &self.config
+    }
+    pub fn labels(&self) -> &Path {
+        &self.labels
     }
 }

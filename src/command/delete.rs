@@ -5,7 +5,7 @@ use crate::repository::Repository;
 
 #[derive(Debug, Parser)]
 pub struct Cli {
-    /// New todo title
+    /// issues id to delete 
     ids: Vec<u32>,
 }
 
