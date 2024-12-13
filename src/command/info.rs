@@ -21,7 +21,7 @@ impl Cli {
         let issues = repository.list(pagination);
         for (id, issue) in issues.iter().enumerate() {
             if self.ids.is_empty() || self.ids.iter().find(|&&index| issue_id(index) == id).is_some() {
-                print_issue_info(id+1, issue);
+                print_issue_info(id+1, issue, repository)?;
                 println!("\n");
             }
         }

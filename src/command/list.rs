@@ -1,6 +1,9 @@
 use anyhow::Result;
 use chrono::Utc;
 use clap::Parser;
+use crossterm::style::style;
+use crossterm::{execute, style, style::Color};
+use std::io::stdout;
 
 use crate::data::Pagination;
 use crate::repository::Repository;
@@ -27,21 +30,55 @@ impl Cli {
             .map(|s| s.title.len())
             .max()
             .unwrap_or(utils::DESCRIPTION.len());
-        println!(
-            "{:<4}{:<4} {:<title_len$} {}",
-            utils::ID,
-            utils::AGE,
-            utils::DESCRIPTION,
-            utils::URG
-        );
+
+        execute!(
+            stdout(),
+            style::SetAttribute(style::Attribute::Bold),
+            style::SetAttribute(style::Attribute::Underlined),
+            // style::SetBackgroundColor(Color::Black),
+            style::SetForegroundColor(Color::Cyan),
+            style::Print(format!(
+                "{:<4}{:<4} {:<title_len$} {}\n",
+                utils::ID,
+                utils::AGE,
+                utils::DESCRIPTION,
+                utils::URG
+            )),
+            style::SetAttribute(style::Attribute::NoUnderline),
+            style::ResetColor,
+            // cursor::MoveToNextLine(0)
+        )?;
         for (id, issue) in issues.iter().enumerate() {
-            println!(
-                "{:<4}{:<4} {:<title_len$} {}",
-                id + 1,
-                print_age(now - issue.created),
-                issue.title,
-                0,
-            );
+            let background = if issue.started.is_some() {
+                Color::DarkYellow
+            }else {
+                Color::Reset
+            };
+            execute!(
+                stdout(),
+                style::SetAttribute(style::Attribute::Bold),
+                style::SetBackgroundColor(background),
+                style::SetForegroundColor(Color::Cyan),
+                style::Print(format!("{:<4}", id + 1,)),
+                style::SetAttribute(style::Attribute::NoBold),
+                style::SetForegroundColor(Color::Reset),
+                // cursor::MoveToNextLine(0)
+            )?;
+          
+            execute!(
+                stdout(),
+                style::SetBackgroundColor(background),
+                style::Print(format!(
+                    "{:<4} {:<title_len$} {}",
+                    print_age(now - issue.created),
+                    issue.title,
+                    0
+                )),
+                style::SetForegroundColor(Color::Reset),
+                style::ResetColor,
+                // cursor::MoveToNextLine(0)
+            )?;
+            execute!( stdout(),style::ResetColor,style::Print("\n"))?;
         }
         Ok(())
     }

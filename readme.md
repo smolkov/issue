@@ -1,3 +1,3 @@
 # `issue`
 
-Cli issue manager.
+Simple cli issue manager.
