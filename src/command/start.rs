@@ -18,6 +18,7 @@ impl Cli {
                 repository.update_backlog(issue)?;
             }
         }
+        repository.save()?;
         Ok(())
     }
 }

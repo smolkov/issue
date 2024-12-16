@@ -37,6 +37,7 @@ impl Issue {
             spend_time: None,
         }
     }
+
     pub fn add_label(&mut self, label: &str) {
         //TODO: create copy from string.
         if self.label.contains(&label.to_string()) {
@@ -52,15 +53,22 @@ impl Issue {
             self.label.push(label.to_owned());
         }
     }
+
     pub fn spend_time(&mut self, duration: Duration) {
-        self.spend_time.as_mut().map(|st| *st += duration);
+        if let Some(st) = self.spend_time.as_mut() {
+            *st = duration;
+        } else {
+            self.spend_time = Some(duration);
+        }
     }
+
     pub fn start(&mut self) {
         self.started = Some(Utc::now());
     }
+
     pub fn stop(&mut self, repository: &mut Repository) -> Result<()> {
         if let Some(start_time) = self.started {
-            let diff  = Utc::now() - start_time;
+            let diff = Utc::now() - start_time;
             let sec = if diff.num_seconds() < 0 {
                 0_u64
             } else {
@@ -68,6 +76,7 @@ impl Issue {
             };
             self.spend_time(Duration::from_secs(sec));
             repository.add_time_entry(self, Utc::now(), Duration::from_secs(sec))?;
+            self.started = None;
         }
         Ok(())
     }
