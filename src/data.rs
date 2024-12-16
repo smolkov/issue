@@ -21,6 +21,7 @@ pub struct Issue {
     pub label: Vec<String>,
     pub created: DateTime<Utc>,
     pub started: Option<DateTime<Utc>>,
+    pub spend_time: Option<Duration>,
 }
 
 impl Issue {
@@ -33,6 +34,7 @@ impl Issue {
             label: Vec::new(),
             created: Utc::now(),
             started: None,
+            spend_time: None,
         }
     }
     pub fn add_label(&mut self, label: &str) {
@@ -43,24 +45,28 @@ impl Issue {
         if let Some((scope, _)) = label.split_once(":") {
             if let Some(pos) = self.label.iter_mut().position(|l| l.starts_with(scope)) {
                 self.label[pos] = label.to_owned();
-            }else {
+            } else {
                 self.label.push(label.to_owned());
             }
         } else {
             self.label.push(label.to_owned());
         }
     }
+    pub fn spend_time(&mut self, duration: Duration) {
+        self.spend_time.as_mut().map(|st| *st += duration);
+    }
     pub fn start(&mut self) {
         self.started = Some(Utc::now());
     }
     pub fn stop(&mut self, repository: &mut Repository) -> Result<()> {
         if let Some(start_time) = self.started {
-            let diff: chrono::TimeDelta = Utc::now() - start_time;
+            let diff  = Utc::now() - start_time;
             let sec = if diff.num_seconds() < 0 {
                 0_u64
             } else {
                 diff.num_seconds() as u64
             };
+            self.spend_time(Duration::from_secs(sec));
             repository.add_time_entry(self, Utc::now(), Duration::from_secs(sec))?;
         }
         Ok(())

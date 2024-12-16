@@ -14,6 +14,7 @@ pub const DESCRIPTION: &str = "Description";
 pub const CREATED: &str = "Created";
 pub const UUID: &str = "Uuid";
 pub const LABELS: &str = "Labels";
+pub const SPEND_TIME: &str = "Spend time";
 pub const URG: &str = "Urg.";
 pub const NAME: &str = "Name";
 pub const VALUE: &str = "Value";
@@ -81,6 +82,11 @@ pub fn print_issue_info(id: usize, issue: &Issue, repository: &Repository) -> Re
         )?;
     }
     execute!(stdout(), style::ResetColor, style::Print("\n"),)?;
+
+    execute!(stdout(), style::ResetColor, 
+    style::Print(format!("{:<NAME_WIDTH$} {}s\n", SPEND_TIME, issue.spend_time.as_ref().map(|td|td.as_secs()).unwrap_or(0))),
+    style::Print("\n"),)?;
+
     Ok(())
 }
 
