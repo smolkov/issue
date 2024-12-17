@@ -22,9 +22,9 @@ pub enum Command {
     Delete(delete::Cli),
     /// Show todo list
     List(list::Cli),
-    /// Show todo list
+    /// Manage labels 
     Label(label::Cli),
-    /// Show todo list
+    /// Show todo info 
     Info(info::Cli),
     /// Start working on issue
     Start(start::Cli),
