@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Subcommand,Parser};
 use clap::CommandFactory;
-use clap_complete::{shells, Generator, Shell};
+use clap_complete::{shells, Generator};
 use crate::repository::Repository;
 use crate::cli::Args;
 
