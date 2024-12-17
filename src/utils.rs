@@ -40,13 +40,25 @@ pub fn print_age(timedelta: TimeDelta) -> String {
 }
 
 pub fn print_issue_info(id: usize, issue: &Issue, repository: &Repository) -> Result<()> {
+    let description_len = issue.title.len();
+    let id_len = issue.id.len();
+    let label_len = issue.label.join(" ").len();
+
+    let value_width = if description_len > id_len && description_len > label_len {
+        description_len
+    }else if id_len > label_len {
+        id_len
+    }else {
+        label_len
+    };
+     
     execute!(
         stdout(),
         style::SetAttribute(style::Attribute::Bold),
         style::SetAttribute(style::Attribute::Underlined),
         style::SetBackgroundColor(Color::Black),
         style::SetForegroundColor(Color::Cyan),
-        style::Print(format!("{:<NAME_WIDTH$} {}", NAME, VALUE)),
+        style::Print(format!("{:<NAME_WIDTH$} {:<value_width$}", NAME, VALUE)),
         style::SetAttribute(style::Attribute::NoUnderline),
         style::ResetColor,
         style::Print("\n"),
