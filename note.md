@@ -1,6 +1,5 @@
 # Note
 
-
 ## Todo
 
-* [ ] generate a
+* [x] generate a completions
