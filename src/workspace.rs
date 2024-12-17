@@ -33,21 +33,7 @@ impl Workspace {
         let working = directory.join(WORKING);
         let config = directory.join(CONFIG);
         let labels = directory.join(LABELS);
-        if !backlog.is_file() {
-            if let Err(e) = fs::write(&backlog, "[]") {
-                panic!("Create empty backlog error - {}", e);
-            }
-        }
-        if !working.is_file() {
-            if let Err(e) = fs::write(&working, "[]") {
-                panic!("Create empty backlog work log error - {}", e);
-            }
-        }
-        if !labels.is_file() {
-            if let Err(e) = fs::write(&labels, "[]") {
-                panic!("Create empty labels error - {}", e);
-            }
-        }
+       
         Workspace {
             directory,
             backlog,

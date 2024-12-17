@@ -97,6 +97,21 @@ impl Repository {
         Ok(())
     }
     pub fn load(&mut self) -> Result<()> {
+        if !WORKSPACE.backlog().is_file() {
+            if let Err(e) = fs::write(&WORKSPACE.backlog(), "[]") {
+                panic!("Create empty backlog error - {}", e);
+            }
+        }
+        if !WORKSPACE.working().is_file() {
+            if let Err(e) = fs::write(&WORKSPACE.working(), "[]") {
+                panic!("Create empty backlog work log error - {}", e);
+            }
+        }
+        if !WORKSPACE.labels().is_file() {
+            if let Err(e) = fs::write(&WORKSPACE.labels(), "[]") {
+                panic!("Create empty labels error - {}", e);
+            }
+        }
         self.backlog = serde_json::from_str(fs::read_to_string(WORKSPACE.backlog())?.as_str())?;
         self.working = serde_json::from_str(fs::read_to_string(WORKSPACE.working())?.as_str())?;
         self.labels = serde_json::from_str(fs::read_to_string(WORKSPACE.labels())?.as_str())?;
