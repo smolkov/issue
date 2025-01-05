@@ -22,11 +22,11 @@ pub const VALUE: &str = "Value";
 pub const ISSUE_NAMES: [&str; 4] = [ID, DESCRIPTION, CREATED, LABELS];
 pub const NAME_WIDTH: usize = 12;
 
-const MINUT_IN_SECOND: i64 = 60;
-const HOUR_IN_SECOND: i64 = MINUT_IN_SECOND * 60;
-const DAY_IN_SECOND: i64 = HOUR_IN_SECOND * 24;
-const MONTH_IN_SECOND: i64 = DAY_IN_SECOND * 30;
-const YEAR_IN_SECOND: i64 = DAY_IN_SECOND * 364;
+pub const MINUT_IN_SECOND: i64 = 60;
+pub const HOUR_IN_SECOND: i64 = MINUT_IN_SECOND * 60;
+pub const DAY_IN_SECOND: i64 = HOUR_IN_SECOND * 24;
+pub const MONTH_IN_SECOND: i64 = DAY_IN_SECOND * 30;
+pub const YEAR_IN_SECOND: i64 = DAY_IN_SECOND * 364;
 
 pub fn print_age(timedelta: TimeDelta) -> String {
     match timedelta.num_seconds() {
@@ -96,7 +96,7 @@ pub fn print_issue_info(id: usize, issue: &Issue, repository: &Repository) -> Re
     execute!(stdout(), style::ResetColor, style::Print("\n"),)?;
 
     execute!(stdout(), style::ResetColor, 
-    style::Print(format!("{:<NAME_WIDTH$} {}s\n", SPEND_TIME, issue.spend_time.as_ref().map(|td|td.as_secs()).unwrap_or(0))),
+    style::Print(format!("{:<NAME_WIDTH$} {:.2}h\n", SPEND_TIME, issue.spend_time.as_ref().map(|td|td.as_secs() as f64 / HOUR_IN_SECOND as f64 ).unwrap_or(0f64))),
     style::Print("\n"),)?;
 
     Ok(())
