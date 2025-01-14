@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use anyhow::Result;
-use chrono::{prelude::*, TimeDelta};
+use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -57,7 +57,7 @@ impl Issue {
 
     pub fn spend_time(&mut self, duration: Duration) {
         if let Some(st) = self.spend_time.as_mut() {
-            *st = duration;
+            *st += duration;
         } else {
             self.spend_time = Some(duration);
         }
