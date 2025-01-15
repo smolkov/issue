@@ -16,8 +16,12 @@ pub struct Cli {
 }
 
 impl Cli {
-    pub fn run(&self, _repository: &Repository) -> Result<()> {
+    pub fn run(&self, repository: &Repository) -> Result<()> {
         println!("show calender information");
+        let time_entry = repository.working();
+        for entry in time_entry {
+            println!("ID:[{}] {}:{}h",entry.id,entry.date.to_string(),entry.duration.as_secs_f64()/3600.0)
+        }
         Ok(())
     }
 }
